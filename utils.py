@@ -39,11 +39,41 @@ def midi_to_matrix(midi):
 	print(matrix.shape)
 	return matrix
 
-dataset_dir = os.path.join(os.path.dirname(os.getcwd()), 'jazzdataset')
+def create_lookup_dictionaries(directory):
+	notes_to_int = dict()
+	duration_to_int = dict()
+	offset_to_int = dict()
+	note_ind = 0
+	dur_ind = 0
+	offset_ind = 0
+	for file in os.listdir(directory)[-16:]:
+		if file.endswith(".mid"):
+			print(file)
+			path = os.path.join(dataset_dir, file)
+			midi = music21.converter.parse(path)
+			if music21.instrument.partitionByInstrument(midi):
+				print("instruments")
+			for element in midi.flat.notes:
+				if isinstance(element, music21.note.Note):
+					if element.nameWithOctave not in notes_to_int.keys():
+						notes_to_int[element.nameWithOctave] = note_ind
+						note_ind+=1
+				elif isinstance(element, music21.chord.Chord):
+					chord = ""
+					for note in element.pitches:
+						chord += note.nameWithOctave
+					if chord not in notes_to_int.keys():
+						notes_to_int[chord] = note_ind
+						note_ind+=1
+	return notes_to_int
 
-for file in os.listdir(dataset_dir)[:1]:
-	if file.endswith(".mid"):
-		path = os.path.join(dataset_dir, file)
-		midi = music21.converter.parse(path)
-		print(midi_to_matrix(midi)[90:,-5:].T)
+
+
+dataset_dir = os.path.join(os.path.dirname(os.getcwd()), 'jazzdataset')
+print(create_lookup_dictionaries(dataset_dir))
+#for file in os.listdir(dataset_dir)[:1]:
+#	if file.endswith(".mid"):
+#		path = os.path.join(dataset_dir, file)
+	#	midi = music21.converter.parse(path)
+	#	print(midi_to_matrix(midi)[90:,-5:].T)
 		
