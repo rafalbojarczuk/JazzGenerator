@@ -1,8 +1,7 @@
 import os
 import sys
 import music21
-import pickle
-
+import json
 
 dataset_dir = os.path.join(os.path.dirname(os.getcwd()), 'jazzdataset')
 
@@ -37,14 +36,14 @@ for file in os.listdir(dataset_dir):
 			#i.e. 0.333312 and 0.33335 should be treated as the same value 1/3
 			offsets.append(round(12*(element.offset - prev_offset)))
 			prev_offset = element.offset
-durations = set(item for item in durations)
-offsets = set(item for item in offsets)
-duration_to_int = dict((duration, number) for number, duration in enumerate(durations))
+durations = sorted(set(item for item in durations))
+offsets = sorted(set(item for item in offsets))
+duration_to_int = dict((str(duration), number) for number, duration in enumerate(durations))
 offset_to_int = dict((offset, number) for number, offset in enumerate(offsets))
 
-with open('notes_to_int', 'wb') as file:
-	pickle.dump(notes_to_int, file)
-with open('duration_to_int', 'wb') as file:
-	pickle.dump(duration_to_int, file)
-with open('offset_to_int', 'wb') as file:
-	pickle.dump(offset_to_int, file)
+with open('notes_to_int.json', 'w') as file:
+	json.dump(notes_to_int, file)
+with open('duration_to_int.json', 'w') as file:
+	json.dump(duration_to_int, file)
+with open('offset_to_int.json', 'w') as file:
+	json.dump(offset_to_int, file)
