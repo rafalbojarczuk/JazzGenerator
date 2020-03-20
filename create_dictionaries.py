@@ -5,7 +5,7 @@ import json
 
 dataset_dir = os.path.join(os.path.dirname(os.getcwd()), 'jazzdataset')
 
-notes = ["rest", "START"]
+notes = dict()
 durations = []
 offsets = []
 for file in os.listdir(dataset_dir):
@@ -21,17 +21,25 @@ for file in os.listdir(dataset_dir):
 		prev_offset = 0.0
 		for element in notes_to_parse:
 			if isinstance(element, music21.note.Note):
-				notes.append(element.nameWithOctave)
+				if element.nameWithOctave not in notes.keys():
+					notes[element.nameWithOctave] = 1
+				else:
+					notes[element.nameWithOctave] += 1
 			elif isinstance(element, music21.chord.Chord):
-				chord = '.'.join(sorted([note.nameWithOctave for note in element.pitches]))
-				notes.append(chord)
-			durations.append(element.duration.quarterLength)
+				chord = '.'.join(sorted(set([note.nameWithOctave for note in element.pitches])))
+				if chord not in notes.keys():
+					notes[chord] = 1
+				else:
+					notes[chord] += 1
 			#smallest offsets are 0.25 and 0.33 so I multiply by 12 and round
 			#it prevents adding different floating-point approximations to the dictionary
 			#i.e. 0.333312 and 0.33335 should be treated as the same value 1/3
+			durations.append(round(12*(element.duration.quarterLength)))
 			offsets.append(round(12*(element.offset - prev_offset)))
 			prev_offset = element.offset
-notes = sorted(set(item for item in notes))
+notes = [x for x in notes if notes[x] > 2]
+notes.extend(['rest', 'START', 'UNKNOWN'])
+notes = sorted(item for item in notes)
 durations = sorted(set(item for item in durations))
 offsets = sorted(set(item for item in offsets))
 notes_to_int = dict((note, number) for number, note in enumerate(notes))

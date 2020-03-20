@@ -1,7 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from tensorflow.keras.utils import to_categorical
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,6 +14,10 @@ seq_length = 32
 notes, durations, offsets = load_training_data()
 network_input, network_output = music_to_network_input(notes, durations, offsets, seq_length)
 
+notes_to_int, int_to_notes, duration_to_int, int_to_duration, offset_to_int, int_to_offset = load_dictionaries()
+notes_num = len(notes_to_int)
+dur_num = len(duration_to_int)
+off_num = len(offset_to_int)
 
 model = create_RNN_model(notes_num, dur_num, off_num, embedding_size=1000, rnn_units=256, add_attention=False)
 
@@ -55,8 +58,8 @@ callbacks_list = [
 
 model.save_weights(os.path.join(weights_folder, "weights.h5"))
 model.fit(network_input, network_output
-          , epochs=2000, batch_size=32
-          , validation_split = 0.2
+          , epochs=20, batch_size=32
+          , validation_split = 0.1
           , callbacks=callbacks_list
           , shuffle=True
          )

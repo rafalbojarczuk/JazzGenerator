@@ -42,17 +42,17 @@ def music_to_network_input(notes, durations, offsets, seq_length=32):
 	for i in range(len(notes) - seq_length):
 		notes_sequence_in = notes[i:i+seq_length]
 		notes_out = notes[i+seq_length]
-		notes_network_input.append([notes_to_int[chord] for chord in notes_sequence_in])
-		notes_network_output.append(notes_to_int[notes_out])
+		notes_network_input.append([notes_to_int[chord] if chord in notes_to_int.keys() else notes_to_int['UNKNOWN'] for chord in notes_sequence_in])
+		notes_network_output.append([notes_to_int[notes_out] if notes_out in notes_to_int.keys() else notes_to_int['UNKNOWN']])
 
 		durations_sequence_in = durations[i:i+seq_length]
 		duration_out = durations[i+seq_length]
-		durations_network_input.append([duration_to_int[dur] if dur in duration_to_int.keys() else float(dur) for dur in durations_sequence_in])
-		durations_network_output.append(duration_to_int[duration_out])
+		durations_network_input.append([duration_to_int[str(dur)] for dur in durations_sequence_in])
+		durations_network_output.append(duration_to_int[str(duration_out)])
 
 		offsets_sequence_in = offsets[i:i+seq_length]
 		offset_out = offsets[i+seq_length]
-		offsets_network_input.append([offset_to_int[off] if off in duration_to_int.keys() else float(off) for off in offsets_sequence_in])
+		offsets_network_input.append([offset_to_int[str(off)] for off in offsets_sequence_in])
 		offsets_network_output.append(offset_to_int[str(offset_out)])
 
 	n_patterns = len(notes_network_input)

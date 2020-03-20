@@ -22,9 +22,9 @@ for file in os.listdir(dataset_dir):
 			if isinstance(element, music21.note.Note):
 				notes.append(element.nameWithOctave)
 			elif isinstance(element, music21.chord.Chord):
-				chord = '.'.join(sorted([note.nameWithOctave for note in element.pitches]))
+				chord = '.'.join(sorted(set([note.nameWithOctave for note in element.pitches])))
 				notes.append(chord)
-			durations.append(str(element.duration.quarterLength))
+			durations.append(round(12*element.duration.quarterLength))
 			#smallest offsets are 0.25 and 0.33 so I multiply by 12 and round
 			#it prevents adding different floating-point approximations to the dictionary
 			#i.e. 0.333312 and 0.33335 should be treated as the same value 1/3
