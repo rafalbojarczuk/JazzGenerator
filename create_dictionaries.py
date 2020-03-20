@@ -37,7 +37,7 @@ for file in os.listdir(dataset_dir):
 			durations.append(round(12*(element.duration.quarterLength)))
 			offsets.append(round(12*(element.offset - prev_offset)))
 			prev_offset = element.offset
-notes = [x for x in notes if notes[x] > 2]
+notes = [x for x in notes if notes[x] > 15]
 notes.extend(['rest', 'START', 'UNKNOWN'])
 notes = sorted(item for item in notes)
 durations = sorted(set(item for item in durations))

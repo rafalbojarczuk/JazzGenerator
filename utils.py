@@ -72,15 +72,15 @@ def music_to_network_input(notes, durations, offsets, seq_length=32):
 	return (network_input, network_output)
 
 
-def create_RNN_model(notes_num, dur_num, off_num, embedding_size=1000, rnn_units=256, add_attention=False):
+def create_RNN_model(notes_num, dur_num, off_num, embedding_size, rnn_units=256, add_attention=False):
 	#dur == durations, off == offset
 	notes_input = Input(shape = (None,))
 	dur_input = Input(shape = (None,))
 	off_input = Input(shape = (None,))
 
 	notes_embed_layer = Embedding(input_dim = notes_num, output_dim = embedding_size)(notes_input)
-	dur_embed_layer =  Embedding(input_dim = dur_num, output_dim = embedding_size//100)(dur_input)
-	off_embed_layer = Embedding(input_dim = off_num, output_dim = embedding_size//100)(off_input)
+	dur_embed_layer =  Embedding(input_dim = dur_num, output_dim = embedding_size//10)(dur_input)
+	off_embed_layer = Embedding(input_dim = off_num, output_dim = embedding_size//10)(off_input)
 
 	embedding_layer = Concatenate()([notes_embed_layer, dur_embed_layer, off_embed_layer])
 
@@ -98,3 +98,11 @@ def create_RNN_model(notes_num, dur_num, off_num, embedding_size=1000, rnn_units
 	opt = tf.keras.optimizers.Adam(lr = 0.001)
 	model.compile(loss=['categorical_crossentropy', 'categorical_crossentropy', 'categorical_crossentropy'], optimizer=opt)
 	return model
+
+def sample(predictions, temp):
+	if temp == 0:
+		return np.argmax(predictions)
+	else:
+		predictions =np.exp(np.log(predictions) / temp)
+		predictions /= np.sum(predictions)
+		return np.random.choice(len(predictions), p=predictions)
